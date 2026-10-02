@@ -14,8 +14,20 @@ formal ISO conformity assessment.
 You need Git and an installed copy of OpenCode or Claude Code. The commands below
 use a POSIX shell, such as Bash or Zsh, on macOS, Linux, or WSL.
 
-Both tools discover skills in `~/.claude/skills/`. To install the skill for all
-your projects, run:
+Choose one installation scope:
+
+- **All projects:** Use the global installation below.
+- **One project:** Use one of the [project installation options](#install-in-one-project).
+
+Avoid installing both scopes with the same skill name. In Claude Code, a personal
+skill takes precedence over a project skill named `technical-writing`, so a global
+installation can override the version your team tracks. OpenCode also searches
+multiple skill directories; use a single installation to make the source clear.
+
+### Install for all projects
+
+Both tools discover skills in `~/.claude/skills/`. The destination folder must be
+named `technical-writing` to match the skill's name. Run:
 
 ```bash
 mkdir -p ~/.claude/skills
@@ -23,15 +35,20 @@ git clone https://github.com/SeverinAlexB/technical-writing-skill.git \
   ~/.claude/skills/technical-writing
 ```
 
-The destination folder must be named `technical-writing` to match the skill's
-name. Cloning installs `SKILL.md` and both reference documents together. No package
-manager or custom installer is needed.
-
-Start a new OpenCode or Claude Code session after installation.
+Cloning installs `SKILL.md` and both reference documents together. Continue to
+[Verify installation](#verify-installation).
 
 ### Install in one project
 
-For a project-local installation, run these commands from the project root:
+Choose one of the following options and run its commands from your project's
+root. Both use `.claude/skills/technical-writing`, which both tools discover
+when working in that project.
+
+#### Local installation
+
+Use this option for your own working copy. It creates a separate Git checkout
+inside the project. To track the skill as part of the project for your team,
+choose the team installation below before running any commands.
 
 ```bash
 mkdir -p .claude/skills
@@ -39,9 +56,13 @@ git clone https://github.com/SeverinAlexB/technical-writing-skill.git \
   .claude/skills/technical-writing
 ```
 
-Both tools discover the skill when working in that project. This creates a
-separate Git checkout inside the project. To share a versioned installation with
-your team, use a Git submodule instead of the project-local clone:
+Continue to [Verify installation](#verify-installation).
+
+#### Team installation
+
+Use this option to track a specific skill version in your project's Git
+repository. Add the skill as a submodule. The destination directory must be
+available; don't run the local installation commands first.
 
 ```bash
 git submodule add https://github.com/SeverinAlexB/technical-writing-skill.git \
@@ -50,6 +71,22 @@ git submodule add https://github.com/SeverinAlexB/technical-writing-skill.git \
 
 Commit `.gitmodules` and the submodule entry in your project. Teammates can fetch
 the installed version with `git submodule update --init --recursive`.
+
+### Verify installation
+
+Start a new OpenCode or Claude Code session. For a project installation, start
+the session in that project.
+
+- **Claude Code:** Confirm that `/technical-writing` appears in the slash-command
+  menu. Invoke it with a request, such as
+  `/technical-writing Review README.md for clarity without editing it`.
+- **OpenCode:** Ask, “Load the technical-writing skill and summarize its writing
+  rules.” Confirm that the agent successfully loads the skill and describes its
+  Google and ISO plain-language guidance.
+
+The installed files alone don't confirm discovery. Check that the tool can load
+the skill before using it for a documentation task. If it doesn't, see
+[The agent doesn't discover the skill](#the-agent-doesnt-discover-the-skill).
 
 ## Use the skill
 
@@ -62,8 +99,7 @@ Invoke the skill explicitly with a request:
 ```
 
 Claude Code can also select the skill automatically when your request matches its
-description. To confirm it is available, look for `/technical-writing` in the
-slash-command menu.
+description.
 
 ### OpenCode
 
@@ -73,8 +109,8 @@ Ask OpenCode to load the skill for your documentation task:
 Use the technical-writing skill to rewrite README.md and the setup guides.
 ```
 
-OpenCode discovers the skill and can load it through its native `skill` tool.
-The skill isn't an OpenCode slash command.
+Include the skill's name in your request when you want OpenCode to use it
+explicitly.
 
 ### Example requests
 
@@ -122,7 +158,9 @@ changes you want to preserve.
 - Start a new session after installing.
 - For a project-local installation, start the agent in the project.
 - Check for another `technical-writing` skill in the tool's other discovery
-  directories. Duplicate installations can make it unclear which copy is used.
+  directories. In Claude Code, a personal installation overrides a project
+  installation with the same name. Keep the installation you intend to use and
+  move other copies to a backup location outside the discovery directories.
 - In OpenCode, check that your skill permissions allow `technical-writing`.
 
 ### Updating fails
@@ -147,4 +185,6 @@ updating; the documented update command doesn't discard them.
 - [Claude Code skills](https://code.claude.com/docs/en/skills)
 
 The skill uses portable `name` and `description` frontmatter and Markdown
-instructions. It doesn't require scripts, plugins, or external services to load.
+instructions. OpenCode loads it through its native `skill` tool; Claude Code
+supports explicit invocation through `/technical-writing`. Loading requires no
+scripts, plugins, or external services.
